@@ -4,7 +4,7 @@
     "from": "0xe3ced0f62f7eb2856d37bed128d2b195712d2644",
     "keystore": "/home/omnia/.ethereum/keystore",
     "password": "/home/omnia/.ethereum/keystore/pass",
-    "network": "mainnet",
+    "network": "testnet",
     "gasPrice": {
       "source": "node",
       "maxPriceMultiplier": 2,
@@ -22,19 +22,17 @@
     "msgLimit": 35,
     "verbose": true,
     "logFormat": "text",
-    "ethGas": 5000000,
-    "chainType": "arbitrum"
+    "ethGas": 150000,
+    "chainType": "ethereum"
   },
-  "transports":["spire"],
+  "transports": ["spire"],
   "scuttlebotIdMap": {
-    "0x2d800d93b065ce011af83f316cef9f0d005b0aa4": "@K5GMWYcMDFf7vJ14fU7GsydkeY5o3NQX0b+oui3DkEs=.ed25519",
-    "0x2d800d93b065ce011af83f316cef9f0d005b0aa4": "@K5GMWYcMDFf7vJ14fU7GsydkeY5o3NQX0b+oui3DkEs=.ed25519",
     "0x2d800d93b065ce011af83f316cef9f0d005b0aa4": "@E7B3opUWe14hpOsPgOzW8YzZv46uus0vVVZtcZ3TQBo=.ed25519"
   },
   "pairs": {
     "BTC/USD": {
       "msgExpiration": 1800,
-      "oracle": "0x490d05d7eF82816F47737c7d72D10f5C172e7772",
+      "oracle": "0xc01750713d34505171c3d66046D3b04C6fFb9cEC",
       "oracleExpiration": 1686828038,
       "oracleSpread": 50
     }

@@ -7,12 +7,14 @@ updateOracle () {
         local entries=()
         local _sortedEntries=()
 
+# todo check if we want to have quorum function in the contract itself
         #get quorum for asset pair
-        _quorum=$(pullOracleQuorum "$assetPair")
-        if [[ -z "$_quorum" || "$_quorum" -le 0 ]]; then
-          error "Error - Invalid quorum, skipping..."
-          continue
-        fi
+#        _quorum=$(pullOracleQuorum "$assetPair")
+#        if [[ -z "$_quorum" || "$_quorum" -le 0 ]]; then
+#          error "Error - Invalid quorum, skipping..."
+#          continue
+#        fi
+        _quorum=1
 
         pullLatestPricesOfAssetPair "$assetPair" "$_quorum"
 
@@ -23,8 +25,19 @@ updateOracle () {
         [ "$(isQuorum "$assetPair" "${#entries[@]}")" == "false" ] && continue
         _prices=$(extractPrices "${entries[@]}")
 
-        _median=$(getMedian "${_prices[@]}")
-        verbose "median" "val=$_median"
+# todo remove this and enable median price after dev
+        local allPrices=()
+        local allTimes=()
+        local allR=()
+        local allS=()
+        local allV=()
+        sortMsgs "${entries[@]}"
+        verbose --raw "sorted messages" "${_sortedEntries[*]}"
+        generateCalldata "${_sortedEntries[@]}"
+        pushOraclePrice "$assetPair" || error "pushOraclePrice failed" "asset=$assetPair"
+
+#        _median=$(getMedian "${_prices[@]}")
+#        verbose "median" "val=$_median"
 
         if [[ ( "$(isPriceValid "$_median")" == "true" ) \
         && ( "$(isOracleStale "$assetPair" "$_median")" == "true" \
@@ -68,13 +81,10 @@ pullLatestPricesOfAssetPair () {
         # valid and not expired.
         local priceEntry
         if priceEntry=$(transportPull "$feed" "$_assetPair") \
-        && [ -n "$priceEntry" ] \
-        && [ "$(isAssetPair "$_assetPair" "$priceEntry")" == "true" ] \
-        && [ "$(isMsgExpired "$_assetPair" "$priceEntry")" == "false" ] \
-        && [ "$(isMsgNew "$_assetPair" "$priceEntry" "$_oracleAge")" == "true" ] \
-        && [ "$(isFeedLifted "$_assetPair" "$feed")" == "1" ]
+        && [ -n "$priceEntry" ]
         then
             log "Adding message catalogue" "feedAddr=$feed"
+            log "Adding message catalogue" "entry=$priceEntry"
             entries+=( "$priceEntry" )
         fi
     done
@@ -99,7 +109,8 @@ generateCalldata () {
         allV+=( "$(ethereum --to-dec "${_sig:128:2}")" )
         allPrices+=( "$(ethereum --to-dec "$( echo "$msg" | jq -r '.priceHex' )")" )
         allTimes+=( "$(ethereum --to-dec "$( echo "$msg" | jq -r '.timeHex' )")" )
+        allSignatures+=( "${_sig}" )
     done
 
-    verbose "allPrices=${allPrices[*]}" "allTimes=${allTimes[*]}" "allR=${allR[*]}" "allS=${allS[*]}" "allV=${allV[*]}"
+    verbose "allPrices=${allPrices[*]}" "allTimes=${allTimes[*]}" "allR=${allR[*]}" "allS=${allS[*]}" "allV=${allV[*]}" "allSignatures=${allSignatures[*]}"
 }

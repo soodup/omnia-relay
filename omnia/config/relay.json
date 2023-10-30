@@ -14,11 +14,11 @@
     "chainType": "ethereum"
   },
   "transports": [
-    "spire",
-    "ssb-rpc"
+    "spire"
   ],
   "feeds": [
     "0x1bb90cde8a032cb4963813a5b4db4981afa5b9c6",
+    "0x2d800d93b065ce011af83f316cef9f0d005b0aa4",
     "0xfadad77b3a7e5a84a1f7ded081e785585d4ffaf3"
   ],
   "pairs": {

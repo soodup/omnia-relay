@@ -212,16 +212,18 @@ isQuorum () {
 	local _numFeeds="$2"
 	local _quorum
 	#get min number of feeds required for quorum from Oracle contract
-	_quorum=$(pullOracleQuorum "$_assetPair")
-	if ! [[ "$_quorum" =~ ^[1-9][0-9]*$ ]]; then
-		error "Error - Invalid quorum ($_quorum)"
-		echo false
-		return 1
-	fi
-	if [ "$_numFeeds" -ge "$_quorum" ]; then
-		echo true
-	else
-		log "Could not reach quorum ($_quorum), only $_numFeeds feeds reporting."
-		echo false
-	fi
+	# todo uncomment this to enable quorum feature
+#	_quorum=$(pullOracleQuorum "$_assetPair")
+#	if ! [[ "$_quorum" =~ ^[1-9][0-9]*$ ]]; then
+#		error "Error - Invalid quorum ($_quorum)"
+#		echo false
+#		return 1
+#	fi
+#	if [ "$_numFeeds" -ge "$_quorum" ]; then
+#		echo true
+#	else
+#		log "Could not reach quorum ($_quorum), only $_numFeeds feeds reporting."
+#		echo false
+#	fi
+  echo true
 }
