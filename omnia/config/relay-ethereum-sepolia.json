@@ -30,7 +30,7 @@
     "0x2d800d93b065ce011af83f316cef9f0d005b0aa4": "@E7B3opUWe14hpOsPgOzW8YzZv46uus0vVVZtcZ3TQBo=.ed25519"
   },
   "pairs": {
-    "BTC/USD": {
+    "cryptopunks/appraisal": {
       "msgExpiration": 1800,
       "oracle": "0xc01750713d34505171c3d66046D3b04C6fFb9cEC",
       "oracleExpiration": 1686828038,

@@ -13,8 +13,8 @@ RUN git clone https://github.com/chronicleprotocol/omnia.git . \
 
 # Building gofer & spire
 WORKDIR /go/src/oracle-suite
-ARG ORACLE_SUITE_REF="tags/v0.10.0"
-RUN git clone https://github.com/chronicleprotocol/oracle-suite.git . \
+ARG ORACLE_SUITE_REF="tags/upshotv0.10.1"
+RUN git clone https://github.com/soodup/oracle-suite.git . \
   && git checkout --quiet ${ORACLE_SUITE_REF}
 
 RUN go mod vendor \

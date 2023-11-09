@@ -66,12 +66,11 @@ signTxBeforePush() {
 	local _gasPrice="${_fees[0]}"
 	local _gasPrio="${_fees[1]}"
 
-# todo uncomment this to fetch gas price
-#	if [ "$_gasPrice" -eq "0" ]; then
-#		_gasPrice=$(ethereum gas-price --rpc-url "$ETH_RPC_URL")
-#	fi
+	if [ "$_gasPrice" -eq "0" ]; then
+		_gasPrice=$(ethereum gas-price --rpc-url "$ETH_RPC_URL")
+	fi
 
-  _gasPrice=12345
+#  _gasPrice=56067566576
 	value=$(ethereum --to-wei "${ETH_VALUE:-0}")
 	value=$(ethereum --to-hex "$value")
 
@@ -108,12 +107,65 @@ pushOraclePrice () {
 		  return 1
 		fi
 
-# todo move the nonce logic here and then create priceData
+    # Encode the function call data.
+#    local _calldata
+#    _calldata=$(ethereum calldata 'getPrice(tuple[],bytes)' \
+#        '[{"signature":"0x7bd1794db101d9a341eeb45308f40512fadf60a0460287b85f4e335c066f487a68543184651136799c34b0adf60be7cab857376fd804cbb1d3dd5be9c71a08fe28","feedId":1,"nonce":4,"timestamp":1699306911,"price":"66198561499975040000000000000000000000","extraData":"0x"}]' \
+#        "0x")
+#
+#		log "Call data $_calldata ..."
+#
+#    # signing tx, cast dont support ethsign, so have to do it manually
+#		local _txdata
+#		if _txdata=$(signTxBeforePush $_oracleContract $_calldata $_fees)
+#		then
+#			verbose "Sign $_assetPair OK"
+#		  log "Sending txdata $_txdata tx..."
+#		else
+#		  error "Sign $_assetPair Failed"
+#		  return 1
+#		fi
+#
+#		if [[ -z "$_txdata" ]]
+#		then
+#			error "Transaction is empty"
+#			return 1
+#		fi
+
+#		log "Simulating $_assetPair tx..."
+#		local _sim
+#		if _sim=$(ethereum call "$_oracleContract" 'poke(uint256[] memory,uint256[] memory,uint8[] memory,bytes32[] memory,bytes32[] memory)' \
+#							"[$(join "${allPrices[@]}")]" \
+#							"[$(join "${allTimes[@]}")]" \
+#							"[$(join "${allV[@]}")]" \
+#							"[$(join "${allR[@]}")]" \
+#							"[$(join "${allS[@]}")]" \
+#							--rpc-url "$ETH_RPC_URL")
+
+#    if _sim=$(ethereum call "$_oracleContract" 'getPrice(tuple[], bytes)' \
+#                            '[{"signature":"0x7bd1794db101d9a341eeb45308f40512fadf60a0460287b85f4e335c066f487a68543184651136799c34b0adf60be7cab857376fd804cbb1d3dd5be9c71a08fe28","feedId":1,"nonce":4,"timestamp":1699306911,"price":"66198561499975040000000000000000000000","extraData":"0x"}]' \
+#                            "0x" \
+#                            --rpc-url "$ETH_RPC_URL")
+#		then
+#			verbose "Sim $_assetPair OK"
+#		else
+#		  error "Sim $_assetPair Failed"
+#		  return 1
+#		fi
+
+  	local _gasPrice="${_fees[0]}"
+    if [ "$_gasPrice" -eq "0" ]; then
+      _gasPrice=$(ethereum gas-price --rpc-url "$ETH_RPC_URL")
+    fi
+    value=$(ethereum --to-wei "${ETH_VALUE:-0}")
+    value=$(ethereum --to-hex "$value")
+    nonce=${ETH_NONCE:-$(ethereum nonce --rpc-url "$ETH_RPC_URL" "$ETH_FROM")}
 
     # Define an array to hold the priceData objects
+    # todo add feedId and extraData logic
     local priceDataArray=()
     for ((i = 0; i < ${#allPrices[@]}; i++)); do
-      priceData="{\"signature\":\"0x${allR[i]}${allS[i]}${allV[i]}\",\"feedId\":1,\"nonce\":4,\"timestamp\":${allTimes[i]},\"price\":\"${allPrices[i]}\",\"extraData\":\"0x\"}"
+      priceData="(0x${allR[i]}${allS[i]}${allV[i]},1,$nonce,${allTimes[i]},${allPrices[i]},0x)"
       priceDataArray+=("$priceData")
     done
 
@@ -129,53 +181,15 @@ pushOraclePrice () {
 
 		log "PriceData json $priceDataJson ..."
 
-    # Encode the function call data.
-    local _calldata
-    _calldata=$(ethereum calldata 'getPrice(tuple[] memory, bytes memory)' \
-      $priceDataJson \
-      "0x")
-
-		log "Call data $_calldata ..."
-
-    # signing tx, cast dont support ethsign, so have to do it manually
-		local _txdata
-		if _txdata=$(signTxBeforePush $_oracleContract $_calldata $_fees)
-		then
-			verbose "Sign $_assetPair OK"
-		else
-		  error "Sign $_assetPair Failed"
-		  return 1
-		fi
-
-		if [[ -z "$_txdata" ]]
-		then
-			error "Transaction is empty"
-			return 1
-		fi
-
-		log "Simulating $_assetPair tx..."
-		local _sim
-#		if _sim=$(ethereum call "$_oracleContract" 'poke(uint256[] memory,uint256[] memory,uint8[] memory,bytes32[] memory,bytes32[] memory)' \
-#							"[$(join "${allPrices[@]}")]" \
-#							"[$(join "${allTimes[@]}")]" \
-#							"[$(join "${allV[@]}")]" \
-#							"[$(join "${allR[@]}")]" \
-#							"[$(join "${allS[@]}")]" \
-#							--rpc-url "$ETH_RPC_URL")
-
-    if _sim=$(ethereum call "$_oracleContract" 'getPrice(tuple[], bytes)' \
-                            $priceDataJson \
-                            "0x" \
-                            --rpc-url "$ETH_RPC_URL")
-		then
-			verbose "Sim $_assetPair OK"
-		else
-		  error "Sim $_assetPair Failed"
-		  return 1
-		fi
-
 		log "Sending $_assetPair tx..."
-		if tx=$(ethereum publish --async --rpc-url "$ETH_RPC_URL" "$_txdata")
+
+#		if tx=$(ethereum publish --async --rpc-url "$ETH_RPC_URL" "$_txdata")
+
+		if tx=$(ethereum send "$_oracleContract" "getPrice((bytes,uint256,uint256,uint96,uint256,bytes)[],bytes)" "$priceDataJson" "0x" \
+		--async --rpc-url "$ETH_RPC_URL" \
+		--nonce "$nonce"\
+		--gas-price "$_gasPrice" --gas-limit "${ETH_GAS:-200000}")
+
 		then
 			verbose "TX $_assetPair OK"
 		else
