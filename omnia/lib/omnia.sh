@@ -48,6 +48,7 @@ initEnv () {
 		printf '      Message Expiration:          %s seconds\n' "$(getMsgExpiration "$assetPair")"
 		printf '      Oracle Expiration:           %s seconds\n' "$(getOracleExpiration "$assetPair")"
 		printf '      Oracle Spread:               %s %% \n' "$(getOracleSpread "$assetPair")"
+		printf '      Feed Id:                     %s\n' "$(getFeedId "$assetPair")"
 	done
 	echo ""
 	echo "-------------------------- INITIALIZATION COMPLETE ---------------------------"

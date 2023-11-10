@@ -160,12 +160,12 @@ pushOraclePrice () {
     value=$(ethereum --to-wei "${ETH_VALUE:-0}")
     value=$(ethereum --to-hex "$value")
     nonce=${ETH_NONCE:-$(ethereum nonce --rpc-url "$ETH_RPC_URL" "$ETH_FROM")}
-
+    feedId=$(getFeedId "$_assetPair")
     # Define an array to hold the priceData objects
-    # todo add feedId and extraData logic
+    # todo add extraData logic if needed
     local priceDataArray=()
     for ((i = 0; i < ${#allPrices[@]}; i++)); do
-      priceData="(0x${allR[i]}${allS[i]}${allV[i]},1,$nonce,${allTimes[i]},${allPrices[i]},0x)"
+      priceData="(0x${allR[i]}${allS[i]}${allV[i]},$feedId,$nonce,${allTimes[i]},${allPrices[i]},0x)"
       priceDataArray+=("$priceData")
     done
 

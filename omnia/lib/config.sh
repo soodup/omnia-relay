@@ -182,7 +182,7 @@ importAssetPairsRelay () {
 		assetPair="${assetPair^^}"
 		assetPair="${assetPair/\/}"
 		assetInfo[$assetPair]="$info"
-	done < <(jq -r '.pairs | keys[] as $assetPair | "\($assetPair)=\(.[$assetPair] | .msgExpiration),\(.[$assetPair] | .oracle),\(.[$assetPair] | .oracleExpiration),\(.[$assetPair] | .oracleSpread)"' <<<"$_config")
+	done < <(jq -r '.pairs | keys[] as $assetPair | "\($assetPair)=\(.[$assetPair] | .msgExpiration),\(.[$assetPair] | .oracle),\(.[$assetPair] | .oracleExpiration),\(.[$assetPair] | .oracleSpread),\(.[$assetPair] | .feedId)"' <<<"$_config")
 
 	for assetPair in "${!assetInfo[@]}"; do
 		_msgExpiration=$(getMsgExpiration "$assetPair")

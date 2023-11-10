@@ -34,7 +34,8 @@
       "msgExpiration": 1800,
       "oracle": "0xc01750713d34505171c3d66046D3b04C6fFb9cEC",
       "oracleExpiration": 1686828038,
-      "oracleSpread": 50
+      "oracleSpread": 50,
+      "feedId": 1
     }
   }
 }
