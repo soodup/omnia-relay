@@ -26,6 +26,7 @@ services:
       SPIRE_CONFIG: "/home/omnia/spire.hcl"
       CFG_SPIRE_RPC_ADDR: "0.0.0.0:9102"
       OMNIA_LOG_FORMAT: "json"
+      ETH_VALUE: 1
 
 networks:
   default:
