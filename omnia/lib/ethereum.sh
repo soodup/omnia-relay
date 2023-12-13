@@ -158,26 +158,26 @@ pushOraclePrice () {
       _gasPrice=$(ethereum gas-price --rpc-url "$ETH_RPC_URL")
     fi
     value=$(ethereum --to-wei "${ETH_VALUE:-0}")
-#    value=$(ethereum --to-hex "$value")
+    value=$(ethereum --to-hex "$value")
     nonce=${ETH_NONCE:-$(ethereum nonce --rpc-url "$ETH_RPC_URL" "$ETH_FROM")}
     feedId=$(getFeedId "$_assetPair")
     # Define an array to hold the priceData objects
     # todo add extraData logic if needed
     local priceDataArray=()
     for ((i = 0; i < ${#allPrices[@]}; i++)); do
-      priceData="(0x${allR[i]}${allS[i]}${allV[i]},($feedId,${allTimes[i]},${allPrices[i]},0x))"
+      priceData="(0x${allR[i]}${allS[i]}${allV[i]},$feedId,$nonce,${allTimes[i]},${allPrices[i]},0x)"
       priceDataArray+=("$priceData")
     done
 
     # Encode the priceDataArray to a JSON string.
-    local priceDataJson="(["
+    local priceDataJson="["
     for ((i = 0; i < ${#priceDataArray[@]}; i++)); do
       if [ $i -gt 0 ]; then
         priceDataJson+=","
       fi
       priceDataJson+="${priceDataArray[i]}"
     done
-    priceDataJson+="],0x)"
+    priceDataJson+="]"
 
 		log "PriceData json $priceDataJson ..."
 
@@ -185,10 +185,9 @@ pushOraclePrice () {
 
 #		if tx=$(ethereum publish --async --rpc-url "$ETH_RPC_URL" "$_txdata")
 
-		if tx=$(ethereum send "$_oracleContract" "verifyData(((bytes,(uint64,uint64,uint256,bytes))[],bytes))" "$priceDataJson"  \
+		if tx=$(ethereum send "$_oracleContract" "getPrice((bytes,uint256,uint256,uint96,uint256,bytes)[],bytes)" "$priceDataJson" "0x" \
 		--async --rpc-url "$ETH_RPC_URL" \
 		--nonce "$nonce"\
-		--value "$value"\
 		--gas-price "$_gasPrice" --gas-limit "${ETH_GAS:-200000}")
 
 		then
