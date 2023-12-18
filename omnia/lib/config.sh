@@ -48,7 +48,7 @@ importTransports () {
 
 # Actual call to eth-rpc was moved to separate function because it helps to mock it in unit tests.
 getLatestBlock () {
-	ethereum block latest number --rpc-url "$1"
+	ethereum block latest -f number --rpc-url "$1"
 }
 
 importNetwork () {

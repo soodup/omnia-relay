@@ -31,14 +31,14 @@ RUN cd ssb-rpc-client && \
   go mod vendor \
   && go build .
 
-FROM ghcr.io/chronicleprotocol/omnia_base:v1.10.4
+FROM omnia-base-upshot
 
 RUN apk add --update --no-cache \
   jq curl git make perl g++ ca-certificates tree \
   bash bash-doc bash-completion \
   util-linux pciutils usbutils coreutils binutils findutils grep iproute2 \
   && apk add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  jshon agrep datamash
+  agrep datamash
 
 COPY --from=go-builder \
   /go/src/omnia/ethsign/ethsign \

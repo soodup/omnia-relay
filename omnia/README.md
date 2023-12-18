@@ -84,6 +84,8 @@ environment:
    ETH_VALUE: 1
 ```
 Note: Make sure you have enough funds in the wallet to submit a txn.
+
+Also, if you dont have the omnia base image or want to dev, please build it from here (https://github.com/upshot-tech/omnia-feed/blob/master/omnia/base.Dockerfile)
 ### Deployment
 - Run Docker compose file `omnia/docker-compose.yml` to start omnia relay service.
 - Run `docker-compose -f docker-compose.yml exec -d omnia_relay sh -c "spire agent -c '/home/omnia/spire.hcl'"` to start spire agent process.
